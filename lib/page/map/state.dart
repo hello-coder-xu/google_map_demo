@@ -1,7 +1,8 @@
 import 'package:google_map_demo/common/bean/area_bean.dart';
 import 'package:google_map_demo/common/bean/city_bean.dart';
+import 'package:google_map_demo/common/bean/community_bean.dart';
+import 'package:google_map_demo/common/bean/villages_bean.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 
 class MapState {
   List<String> popValue = [
@@ -24,16 +25,16 @@ class MapState {
   ///3-鄉鎮-16
   int zoomType = 1;
 
-  double community = 12.0;
-  double city = 15.0;
-  double villages = 16.0;
+  double city = 12.0;
+  double village = 15.0;
+  double community = 16.0;
 
   String areaId = '1';
 
   int areaType = 1;
 
   ///县市
-  String regionId = '0';
+  String regionId = '1';
 
   ///地区
   String sectionId = '0';
@@ -62,8 +63,14 @@ class MapState {
   /// 地区范围
   late AreaBean areaBean;
 
-  /// 社区数据
-  late CityBean cityBean;
+  /// 城市大头针数据
+  CityBean? cityBean;
+
+  /// 乡村大头针数据
+  VillageBean? villageBean;
+
+  /// 社区大头针数据
+  CommunityBean? communityBean;
 
   /// 显示底部视图
   bool displayBottomView = true;

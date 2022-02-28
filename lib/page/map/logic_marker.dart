@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_map_demo/common/api/api.dart';
 import 'package:google_map_demo/common/bean/city_bean.dart';
+import 'package:google_map_demo/common/bean/community_bean.dart';
+import 'package:google_map_demo/common/bean/villages_bean.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/common/network/http_request.dart';
 import 'package:google_map_demo/page/map/logic.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-extension CommunityLogic on MapLogic {
+extension MarkerLogic on MapLogic {
   /// 加载社区数据
-  void loadCommunityData(
-      {String regionId = '1', String sectionId = '0'}) async {
+  void loadCommunityData() async {
     LatLngBounds? latLngBounds = await state.controller?.getVisibleRegion();
 
     Logger.write('test loadCommunityData：${latLngBounds?.toJson()}');
@@ -41,15 +42,15 @@ extension CommunityLogic on MapLogic {
     } else if (state.zoomType == 2) {
       searchType = 5;
     } else if (state.zoomType == 3) {
-      searchType = 7;
+      searchType = 1;
     }
 
     String url = Api.communityUrl;
     var param = {
       'points': points,
       'search_type': searchType,
-      'regionid': regionId,
-      'sectionid': sectionId,
+      'regionid': state.regionId,
+      'sectionid': state.sectionId,
       'zoom': zoomValue,
     };
 
@@ -58,7 +59,15 @@ extension CommunityLogic on MapLogic {
       formData: param,
       callBack: (data) {
         Logger.write(data.toString());
-        state.cityBean = CityBean.fromJson(data);
+
+        if (state.zoomType == 1) {
+          state.cityBean = CityBean.fromJson(data);
+        } else if (state.zoomType == 2) {
+          state.villageBean = VillageBean.fromJson(data);
+        } else if (state.zoomType == 3) {
+          state.communityBean = CommunityBean.fromJson(data);
+        }
+
         // 绘制圆
         drawMarker();
       },
@@ -71,22 +80,65 @@ extension CommunityLogic on MapLogic {
     state.markers.clear();
 
     //自定义大头针
-    List<CityItem> list = state.cityBean.data.items;
-    for (var bean in list) {
-      String title = bean.sectionName;
-      String value = '${bean.priceUnit.price}${bean.priceUnit.unit}';
-      BitmapDescriptor icon = await getRoundIcon('$title\n$value');
-      MarkerId markerId = MarkerId('marker_${bean.sectionId}');
-      LatLng position = LatLng(double.parse(bean.lat), double.parse(bean.lng));
-      final Marker marker = Marker(
-        markerId: markerId,
-        position: position,
-        icon: icon,
-        onTap: () => markerClick(bean, position),
-      );
-      state.markers[markerId] = marker;
+    if (state.zoomType == 1) {
+      //城市
+      List<CityItem>? list = state.cityBean?.data.items;
+
+      if (list == null) return;
+      for (var bean in list) {
+        String title = bean.sectionName;
+        String value = '${bean.priceUnit.price}${bean.priceUnit.unit}';
+        BitmapDescriptor icon = await getRoundIcon('$title\n$value');
+        MarkerId markerId = MarkerId('marker_${bean.sectionId}');
+        LatLng position =
+            LatLng(double.parse(bean.lat), double.parse(bean.lng));
+        final Marker marker = Marker(
+          markerId: markerId,
+          position: position,
+          icon: icon,
+          onTap: () => markerCityClick(bean, position),
+        );
+        state.markers[markerId] = marker;
+      }
+    } else if (state.zoomType == 2) {
+      //乡村
+      List<VillageItem>? list = state.villageBean?.data.items;
+      if (list == null) return;
+      for (var bean in list) {
+        String title = bean.shopName;
+        BitmapDescriptor icon = await getRoundIcon(title);
+        MarkerId markerId = MarkerId('marker_${bean.shopId}');
+        LatLng position =
+            LatLng(double.parse(bean.lat), double.parse(bean.lng));
+        final Marker marker = Marker(
+          markerId: markerId,
+          position: position,
+          icon: icon,
+          onTap: () => markerVillageClick(bean, position),
+        );
+        state.markers[markerId] = marker;
+      }
+    } else if (state.zoomType == 3) {
+      // 社区
+      List<CommunityItem>? list = state.communityBean?.data.items;
+      if (list == null) return;
+      for (var bean in list) {
+        String title = bean.name;
+        BitmapDescriptor icon = await getRoundIcon(title);
+        MarkerId markerId = MarkerId('marker_${bean.id}');
+        LatLng position =
+            LatLng(double.parse(bean.lat), double.parse(bean.lng));
+        final Marker marker = Marker(
+          markerId: markerId,
+          position: position,
+          icon: icon,
+          onTap: () => markerCommunityClick(bean, position),
+        );
+        state.markers[markerId] = marker;
+      }
+
+      update();
     }
-    update();
   }
 
   /// 清空大头针

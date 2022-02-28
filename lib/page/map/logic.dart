@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_map_demo/common/bean/city_bean.dart';
+import 'package:google_map_demo/common/bean/community_bean.dart';
+import 'package:google_map_demo/common/bean/villages_bean.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/page/map/logic_area.dart';
 import 'package:google_map_demo/page/map/logic_marker.dart';
@@ -30,11 +32,11 @@ class MapLogic extends GetxController {
   /// 获取缩放比例值
   double get zoomValue {
     if (state.zoomType == 1) {
-      return state.community;
-    } else if (state.zoomType == 2) {
       return state.city;
+    } else if (state.zoomType == 2) {
+      return state.village;
     } else {
-      return state.villages;
+      return state.community;
     }
   }
 
@@ -85,8 +87,8 @@ class MapLogic extends GetxController {
     update();
   }
 
-  /// 大头针点击
-  void markerClick(CityItem bean, LatLng position) {
+  /// 城市-大头针点击
+  void markerCityClick(CityItem bean, LatLng position) {
     state.zoomType = 2;
     state.regionId = '${bean.regionId}';
     state.sectionId = '${bean.sectionId}';
@@ -99,10 +101,33 @@ class MapLogic extends GetxController {
         ?.animateCamera(CameraUpdate.newLatLngZoom(position, zoomValue));
 
     //加载区域数据
-    loadAreaData(areaId: state.areaId, type: state.areaType);
+    loadAreaData();
 
     //加载社区数据
-    loadCommunityData(regionId: state.regionId, sectionId: state.sectionId);
+    loadCommunityData();
+  }
+
+  /// 乡村-大头针点击
+  void markerVillageClick(VillageItem bean, LatLng position) {
+    state.zoomType = 3;
+
+    state.areaId = '${bean.shopId}';
+    state.areaType = 3;
+
+    //移动并放大
+    state.controller
+        ?.animateCamera(CameraUpdate.newLatLngZoom(position, zoomValue));
+
+    //加载区域数据
+    loadAreaData();
+
+    //加载社区数据
+    loadCommunityData();
+  }
+
+  /// 社区-大头针点击
+  void markerCommunityClick(CommunityItem bean, LatLng position) {
+
   }
 
   /// 绘制圆

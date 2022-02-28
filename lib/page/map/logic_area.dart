@@ -9,9 +9,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 extension AreaLogic on MapLogic {
   /// 加载地区范围
-  void loadAreaData({String areaId = '1', int type = 1}) {
+  void loadAreaData() {
     String url = Api.areaUrl;
-    var param = {'area_id': areaId, 'type': type};
+    var param = {
+      'area_id': state.areaId,
+      'type': state.areaType,
+    };
     HttpRequest.getInstance().get(
       url,
       params: param,
