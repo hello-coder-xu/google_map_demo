@@ -36,11 +36,12 @@ class MapPage extends StatelessWidget {
           body: Stack(
             children: [
               mapView,
-              Positioned(
-                bottom: 0,
-                left: 0,
-                child: bottomView,
-              ),
+              if (state.displayBottomView)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: bottomView,
+                ),
             ],
           ),
         );
@@ -54,7 +55,7 @@ class MapPage extends StatelessWidget {
         //获取controller
         onMapCreated: logic.onMapCreated,
         //是否显示指南针(旋转时才出现)
-        compassEnabled: false,
+        compassEnabled: true,
         //-----不清楚-------
         mapToolbarEnabled: true,
         //不清楚- 貌似限制纬度范围可以滑动
@@ -71,21 +72,23 @@ class MapPage extends StatelessWidget {
         //是否可以滚动
         scrollGesturesEnabled: true,
         //是否显示加减 by android
-        zoomControlsEnabled: false,
+        zoomControlsEnabled: true,
         //是否支持手势缩放
         zoomGesturesEnabled: true,
         // 地图是否为精简模式(不可指定位置与缩放拖地地图)  by android
         liteModeEnabled: false,
         //-----不清楚-------
-        tiltGesturesEnabled: false,
+        tiltGesturesEnabled: true,
         // 定为是否可用
         myLocationEnabled: true,
         // 是否google map 应用按钮
-        myLocationButtonEnabled: false,
+        myLocationButtonEnabled: true,
         //-----不清楚-------
         layoutDirection: TextDirection.rtl,
         // 设置定位按钮|缩放按钮在地图上的内间距
-        padding: const EdgeInsets.only(top: 600),
+        padding: state.displayBottomView
+            ? const EdgeInsets.only(bottom: 100)
+            : EdgeInsets.zero,
         //-----不清楚-------
         indoorViewEnabled: true,
         //是否显示交通

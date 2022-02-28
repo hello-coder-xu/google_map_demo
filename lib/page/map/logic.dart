@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
-import 'package:google_map_demo/page/map/area_logic.dart';
-import 'package:google_map_demo/page/map/community_logic.dart';
+import 'package:google_map_demo/page/map/logic_area.dart';
+import 'package:google_map_demo/page/map/logic_marker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'state.dart';
 
@@ -11,13 +12,30 @@ class MapLogic extends GetxController {
 
   @override
   void onInit() {
+    super.onInit();
     state.kInitialPosition = CameraPosition(
       target: state.initLatLng,
-      zoom: state.zoom,
+      zoom: zoomValue,
     );
-    super.onInit();
-    loadAreaData();
-    loadCommunityData();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    Logger.write('test onReady');
+
+    // 此时map的controller还未创建好
+  }
+
+  /// 获取缩放比例值
+  double get zoomValue {
+    if (state.zoomType == 1) {
+      return state.community;
+    } else if (state.zoomType == 2) {
+      return state.city;
+    } else {
+      return state.villages;
+    }
   }
 
   /// popMenu 点击
@@ -25,22 +43,27 @@ class MapLogic extends GetxController {
     Logger.write(result);
     int index = state.popValue.indexOf(result);
     switch (index) {
-      case 0: //台北
-        break;
-      case 1: //大头针
+      case 0: //添加大头针
         drawMarker();
         break;
-      case 2: //画区域
+      case 1: //移除大头针
+        clearMarker();
+        break;
+      case 2: //添加画区域
         drawArea();
         break;
-      case 3: //画圆
-        drawRound();
+      case 3: //移除画区域
+        clearArea();
         break;
-      case 4:
+      case 4: // 加载区域数据
         loadAreaData();
         break;
-      case 5:
+      case 5: // 加载圆数据
         loadCommunityData();
+        break;
+      case 6: //显示底部视图
+        state.displayBottomView = !state.displayBottomView;
+        update();
         break;
     }
   }
@@ -48,6 +71,11 @@ class MapLogic extends GetxController {
   /// 获取地图控制器
   void onMapCreated(GoogleMapController controller) {
     state.controller = controller;
+    Logger.write('test onMapCreated 完成');
+
+    // 此方法只执行一次
+    loadAreaData();
+    loadCommunityData();
   }
 
   /// 地图点击
@@ -55,6 +83,26 @@ class MapLogic extends GetxController {
     state.currentLatLng = result;
     Logger.write(result.toString());
     update();
+  }
+
+  /// 大头针点击
+  void markerClick(CityItem bean, LatLng position) {
+    state.zoomType = 2;
+    state.regionId = '${bean.regionId}';
+    state.sectionId = '${bean.sectionId}';
+
+    state.areaId = '${bean.sectionId}';
+    state.areaType = 2;
+
+    //移动并放大
+    state.controller
+        ?.animateCamera(CameraUpdate.newLatLngZoom(position, zoomValue));
+
+    //加载区域数据
+    loadAreaData(areaId: state.areaId, type: state.areaType);
+
+    //加载社区数据
+    loadCommunityData(regionId: state.regionId, sectionId: state.sectionId);
   }
 
   /// 绘制圆

@@ -5,4 +5,5 @@ class Api {
   /// 社区数据
   static const String communityUrl =
       'https://api.591.com.tw/api/search/surrounding-community';
+
 }

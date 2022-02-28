@@ -1,10 +1,9 @@
 import 'dart:typed_data';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_map_demo/common/api/api.dart';
-import 'package:google_map_demo/common/bean/community_bean.dart';
+import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/common/network/http_request.dart';
 import 'package:google_map_demo/page/map/logic.dart';
@@ -12,23 +11,46 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 extension CommunityLogic on MapLogic {
   /// 加载社区数据
-  void loadCommunityData() {
+  void loadCommunityData(
+      {String regionId = '1', String sectionId = '0'}) async {
+    LatLngBounds? latLngBounds = await state.controller?.getVisibleRegion();
+
+    Logger.write('test loadCommunityData：${latLngBounds?.toJson()}');
+    if (latLngBounds == null) return;
+    // 西南 -- 左下角
+    LatLng leftDown = latLngBounds.southwest;
+    String leftDownValue = '[${leftDown.longitude},${leftDown.latitude}]';
+    // 东北 -- 右上角
+    LatLng rightUp = latLngBounds.northeast;
+    String rightUpValue = '[${rightUp.longitude},${rightUp.latitude}]';
+
+    // 西北 -- 左上角
+    LatLng leftUp = LatLng(leftDown.latitude, rightUp.longitude);
+    String leftUpValue = '[${leftUp.longitude},${leftUp.latitude}]';
+
+    // 东南 -- 右下角
+    LatLng rightDown = LatLng(rightUp.latitude, leftDown.longitude);
+    String rightDownValue = '[${rightDown.longitude},${rightDown.latitude}]';
+
+    String points =
+        '[$leftUpValue,$rightUpValue,$leftDownValue,$rightDownValue]';
+
+    int searchType = 3;
+    if (state.zoomType == 1) {
+      searchType = 3;
+    } else if (state.zoomType == 2) {
+      searchType = 5;
+    } else if (state.zoomType == 3) {
+      searchType = 7;
+    }
+
     String url = Api.communityUrl;
     var param = {
-      'post_type[]': '8',
-      'points':
-          '[[121.50104451924564,25.16689697307254],[121.50104451924564,24.898895105384458],[121.62979055196047,24.898895105384458],[121.62979055196047,25.16689697307254]]',
-      'search_type': '3',
-      'build_purpose': '',
-      'device_id': '69a8eb91-2e5c-42f0-abd2-a3dc09b7bce2',
-      'center': '25.032969370272014,121.56541753560306',
-      'trans_date': '',
-      'regionid': '1',
-      'sectionid': '0',
-      'location': '25.032969370272014,121.56541753560306',
-      'zoom': '12.0',
-      'price_unit': '0',
-      'age': '0'
+      'points': points,
+      'search_type': searchType,
+      'regionid': regionId,
+      'sectionid': sectionId,
+      'zoom': zoomValue,
     };
 
     HttpRequest.getInstance().post(
@@ -36,7 +58,7 @@ extension CommunityLogic on MapLogic {
       formData: param,
       callBack: (data) {
         Logger.write(data.toString());
-        state.communityBean = CommunityBean.fromJson(data);
+        state.cityBean = CityBean.fromJson(data);
         // 绘制圆
         drawMarker();
       },
@@ -45,30 +67,31 @@ extension CommunityLogic on MapLogic {
 
   /// 增加大头针
   void drawMarker() async {
-    if (state.markers.isNotEmpty) {
-      state.markers.clear();
-    } else {
-      //自定义大头针
-      List<CommunityItem> list = state.communityBean.data.items;
-      for (var bean in list) {
-        String title = bean.sectionName;
-        String value = '${bean.priceUnit.price}${bean.priceUnit.unit}';
-        BitmapDescriptor icon = await getRoundIcon('$title\n$value');
-        MarkerId markerId = MarkerId('marker_${bean.sectionId}');
-        LatLng position =
-            LatLng(double.parse(bean.lat), double.parse(bean.lng));
-        final Marker marker = Marker(
-          markerId: markerId,
-          position: position,
-          icon: icon,
-          onTap: () {
-            Logger.write('大头针: ${markerId.value}');
+    // 清除之前的
+    state.markers.clear();
 
-          },
-        );
-        state.markers[markerId] = marker;
-      }
+    //自定义大头针
+    List<CityItem> list = state.cityBean.data.items;
+    for (var bean in list) {
+      String title = bean.sectionName;
+      String value = '${bean.priceUnit.price}${bean.priceUnit.unit}';
+      BitmapDescriptor icon = await getRoundIcon('$title\n$value');
+      MarkerId markerId = MarkerId('marker_${bean.sectionId}');
+      LatLng position = LatLng(double.parse(bean.lat), double.parse(bean.lng));
+      final Marker marker = Marker(
+        markerId: markerId,
+        position: position,
+        icon: icon,
+        onTap: () => markerClick(bean, position),
+      );
+      state.markers[markerId] = marker;
     }
+    update();
+  }
+
+  /// 清空大头针
+  void clearMarker() {
+    state.markers.clear();
     update();
   }
 

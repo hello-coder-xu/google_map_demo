@@ -1,19 +1,19 @@
 import 'package:google_map_demo/common/network/safe_convert.dart';
 
-class CommunityBean {
+class CityBean {
   final int status;
-  final CommunityData data;
+  final CityData data;
   final String msg;
 
-  CommunityBean({
+  CityBean({
     this.status = 0,
     required this.data,
     this.msg = "",
   });
 
-  factory CommunityBean.fromJson(Map<String, dynamic>? json) => CommunityBean(
+  factory CityBean.fromJson(Map<String, dynamic>? json) => CityBean(
         status: asInt(json, 'status'),
-        data: CommunityData.fromJson(asMap(json, 'data')),
+        data: CityData.fromJson(asMap(json, 'data')),
         msg: asString(json, 'msg'),
       );
 
@@ -24,16 +24,16 @@ class CommunityBean {
       };
 }
 
-class CommunityData {
+class CityData {
   final int count;
-  final List<CommunityItem> items;
-  final Location location;
-  final Meta meta;
+  final List<CityItem> items;
+  final CityLocation location;
+  final CityMeta meta;
   final String browseNum;
   final int follow;
-  final FollowNew followNew;
+  final CityFollowNew followNew;
 
-  CommunityData({
+  CityData({
     this.count = 0,
     required this.items,
     required this.location,
@@ -43,14 +43,14 @@ class CommunityData {
     required this.followNew,
   });
 
-  factory CommunityData.fromJson(Map<String, dynamic>? json) => CommunityData(
+  factory CityData.fromJson(Map<String, dynamic>? json) => CityData(
         count: asInt(json, 'count'),
-        items: asList(json, 'items').map((e) => CommunityItem.fromJson(e)).toList(),
-        location: Location.fromJson(asMap(json, 'location')),
-        meta: Meta.fromJson(asMap(json, 'meta')),
+        items: asList(json, 'items').map((e) => CityItem.fromJson(e)).toList(),
+        location: CityLocation.fromJson(asMap(json, 'location')),
+        meta: CityMeta.fromJson(asMap(json, 'meta')),
         browseNum: asString(json, 'browse_num'),
         follow: asInt(json, 'follow'),
-        followNew: FollowNew.fromJson(asMap(json, 'follow_new')),
+        followNew: CityFollowNew.fromJson(asMap(json, 'follow_new')),
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,13 +64,13 @@ class CommunityData {
       };
 }
 
-class CommunityItem {
+class CityItem {
   final int sectionId;
   final String sectionName;
   final int count;
   final String lat;
   final String lng;
-  final PriceUnit priceUnit;
+  final CityPriceUnit priceUnit;
   final String gatherLat;
   final String gatherLng;
   final int regionId;
@@ -78,7 +78,7 @@ class CommunityItem {
   final int shopCount;
   final String distance;
 
-  CommunityItem({
+  CityItem({
     this.sectionId = 0,
     this.sectionName = "",
     this.count = 0,
@@ -93,13 +93,13 @@ class CommunityItem {
     this.distance = "",
   });
 
-  factory CommunityItem.fromJson(Map<String, dynamic>? json) => CommunityItem(
+  factory CityItem.fromJson(Map<String, dynamic>? json) => CityItem(
         sectionId: asInt(json, 'sectionid'),
         sectionName: asString(json, 'section_name'),
         count: asInt(json, 'count'),
         lat: asString(json, 'lat'),
         lng: asString(json, 'lng'),
-        priceUnit: PriceUnit.fromJson(asMap(json, 'price_unit')),
+        priceUnit: CityPriceUnit.fromJson(asMap(json, 'price_unit')),
         gatherLat: asString(json, 'gather_lat'),
         gatherLng: asString(json, 'gather_lng'),
         regionId: asInt(json, 'regionid'),
@@ -124,16 +124,16 @@ class CommunityItem {
       };
 }
 
-class PriceUnit {
+class CityPriceUnit {
   final String price;
   final String unit;
 
-  PriceUnit({
+  CityPriceUnit({
     this.price = "",
     this.unit = "",
   });
 
-  factory PriceUnit.fromJson(Map<String, dynamic>? json) => PriceUnit(
+  factory CityPriceUnit.fromJson(Map<String, dynamic>? json) => CityPriceUnit(
         price: asString(json, 'price'),
         unit: asString(json, 'unit'),
       );
@@ -144,18 +144,18 @@ class PriceUnit {
       };
 }
 
-class Location {
-  final Region region;
-  final Section section;
+class CityLocation {
+  final CityRegion region;
+  final CitySection section;
 
-  Location({
+  CityLocation({
     required this.region,
     required this.section,
   });
 
-  factory Location.fromJson(Map<String, dynamic>? json) => Location(
-        region: Region.fromJson(asMap(json, 'region')),
-        section: Section.fromJson(asMap(json, 'section')),
+  factory CityLocation.fromJson(Map<String, dynamic>? json) => CityLocation(
+        region: CityRegion.fromJson(asMap(json, 'region')),
+        section: CitySection.fromJson(asMap(json, 'section')),
       );
 
   Map<String, dynamic> toJson() => {
@@ -164,16 +164,16 @@ class Location {
       };
 }
 
-class Region {
+class CityRegion {
   final int id;
   final String name;
 
-  Region({
+  CityRegion({
     this.id = 0,
     this.name = "",
   });
 
-  factory Region.fromJson(Map<String, dynamic>? json) => Region(
+  factory CityRegion.fromJson(Map<String, dynamic>? json) => CityRegion(
         id: asInt(json, 'id'),
         name: asString(json, 'name'),
       );
@@ -184,16 +184,16 @@ class Region {
       };
 }
 
-class Section {
+class CitySection {
   final int id;
   final String name;
 
-  Section({
+  CitySection({
     this.id = 0,
     this.name = "",
   });
 
-  factory Section.fromJson(Map<String, dynamic>? json) => Section(
+  factory CitySection.fromJson(Map<String, dynamic>? json) => CitySection(
         id: asInt(json, 'id'),
         name: asString(json, 'name'),
       );
@@ -204,18 +204,18 @@ class Section {
       };
 }
 
-class Meta {
+class CityMeta {
   final String title;
   final String keywords;
   final String description;
 
-  Meta({
+  CityMeta({
     this.title = "",
     this.keywords = "",
     this.description = "",
   });
 
-  factory Meta.fromJson(Map<String, dynamic>? json) => Meta(
+  factory CityMeta.fromJson(Map<String, dynamic>? json) => CityMeta(
         title: asString(json, 'title'),
         keywords: asString(json, 'keywords'),
         description: asString(json, 'description'),
@@ -228,16 +228,16 @@ class Meta {
       };
 }
 
-class FollowNew {
+class CityFollowNew {
   final int count;
   final String str;
 
-  FollowNew({
+  CityFollowNew({
     this.count = 0,
     this.str = "",
   });
 
-  factory FollowNew.fromJson(Map<String, dynamic>? json) => FollowNew(
+  factory CityFollowNew.fromJson(Map<String, dynamic>? json) => CityFollowNew(
         count: asInt(json, 'count'),
         str: asString(json, 'str'),
       );
