@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/page/map/logic.dart';
+import 'package:google_map_demo/page/map/logic_marker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapPage extends StatelessWidget {
@@ -36,6 +37,16 @@ class MapPage extends StatelessWidget {
           body: Stack(
             children: [
               mapView,
+              Center(
+                child: CustomPaint(
+                  painter: BorderPainter(
+                    radius: 30,
+                    width: 120,
+                    height: 60,
+                    borderWidth: 5,
+                  ),
+                ),
+              ),
               if (state.displayBottomView)
                 Positioned(
                   bottom: 0,
@@ -137,7 +148,8 @@ class MapPage extends StatelessWidget {
           children: [
             Text('latitude:${state.currentLatLng.latitude}')
                 .marginOnly(bottom: 16),
-            Text('longitude:${state.currentLatLng.longitude}'),
+            Text('longitude:${state.currentLatLng.longitude}')
+                .marginOnly(bottom: 16),
           ],
         ),
       );

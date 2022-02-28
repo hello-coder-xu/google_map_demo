@@ -31,7 +31,7 @@ extension AreaLogic on MapLogic {
   /// 绘制区域
   void drawArea() {
     // 清除之前的
-    state.polygons.clear();
+    clearArea();
 
     // 添加新的区域
     List<LatLng> temp = state.areaBean.data.geoBoundingBox
