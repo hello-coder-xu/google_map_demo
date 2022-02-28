@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/page/map/logic.dart';
@@ -32,10 +33,14 @@ class MapPage extends StatelessWidget {
               )
             ],
           ),
-          body: Column(
+          body: Stack(
             children: [
-              Expanded(child: mapView),
-              bottomView,
+              mapView,
+              Positioned(
+                bottom: 0,
+                left: 0,
+                child: bottomView,
+              ),
             ],
           ),
         );
@@ -49,7 +54,7 @@ class MapPage extends StatelessWidget {
         //获取controller
         onMapCreated: logic.onMapCreated,
         //是否显示指南针(旋转时才出现)
-        compassEnabled: true,
+        compassEnabled: false,
         //-----不清楚-------
         mapToolbarEnabled: true,
         //不清楚- 貌似限制纬度范围可以滑动
@@ -65,8 +70,8 @@ class MapPage extends StatelessWidget {
         rotateGesturesEnabled: true,
         //是否可以滚动
         scrollGesturesEnabled: true,
-        //不显示加减 by android
-        zoomControlsEnabled: true,
+        //是否显示加减 by android
+        zoomControlsEnabled: false,
         //是否支持手势缩放
         zoomGesturesEnabled: true,
         // 地图是否为精简模式(不可指定位置与缩放拖地地图)  by android
@@ -76,7 +81,7 @@ class MapPage extends StatelessWidget {
         // 定为是否可用
         myLocationEnabled: true,
         // 是否google map 应用按钮
-        myLocationButtonEnabled: true,
+        myLocationButtonEnabled: false,
         //-----不清楚-------
         layoutDirection: TextDirection.rtl,
         // 设置定位按钮|缩放按钮在地图上的内间距
@@ -86,7 +91,7 @@ class MapPage extends StatelessWidget {
         //是否显示交通
         trafficEnabled: false,
         // 是否显示3d视图
-        buildingsEnabled: true,
+        buildingsEnabled: false,
         //大头针
         markers: Set<Marker>.of(state.markers.values),
         //区域
@@ -121,20 +126,15 @@ class MapPage extends StatelessWidget {
   Widget get bottomView => Container(
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.all(32),
+        width: 1.sw,
+        color: Colors.white,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              child: Text('latitude:${state.currentLatLng.latitude}'),
-              height: 30,
-              alignment: Alignment.centerLeft,
-            ),
-            Container(
-              child: Text('longitude:${state.currentLatLng.longitude}'),
-              height: 30,
-              alignment: Alignment.centerLeft,
-            ),
+            Text('latitude:${state.currentLatLng.latitude}')
+                .marginOnly(bottom: 16),
+            Text('longitude:${state.currentLatLng.longitude}'),
           ],
         ),
       );

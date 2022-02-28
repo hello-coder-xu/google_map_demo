@@ -2,7 +2,7 @@ import 'package:google_map_demo/common/network/safe_convert.dart';
 
 class CommunityBean {
   final int status;
-  final Data data;
+  final CommunityData data;
   final String msg;
 
   CommunityBean({
@@ -13,7 +13,7 @@ class CommunityBean {
 
   factory CommunityBean.fromJson(Map<String, dynamic>? json) => CommunityBean(
         status: asInt(json, 'status'),
-        data: Data.fromJson(asMap(json, 'data')),
+        data: CommunityData.fromJson(asMap(json, 'data')),
         msg: asString(json, 'msg'),
       );
 
@@ -24,16 +24,16 @@ class CommunityBean {
       };
 }
 
-class Data {
+class CommunityData {
   final int count;
-  final List<ItemsItem> items;
+  final List<CommunityItem> items;
   final Location location;
   final Meta meta;
   final String browseNum;
   final int follow;
   final FollowNew followNew;
 
-  Data({
+  CommunityData({
     this.count = 0,
     required this.items,
     required this.location,
@@ -43,9 +43,9 @@ class Data {
     required this.followNew,
   });
 
-  factory Data.fromJson(Map<String, dynamic>? json) => Data(
+  factory CommunityData.fromJson(Map<String, dynamic>? json) => CommunityData(
         count: asInt(json, 'count'),
-        items: asList(json, 'items').map((e) => ItemsItem.fromJson(e)).toList(),
+        items: asList(json, 'items').map((e) => CommunityItem.fromJson(e)).toList(),
         location: Location.fromJson(asMap(json, 'location')),
         meta: Meta.fromJson(asMap(json, 'meta')),
         browseNum: asString(json, 'browse_num'),
@@ -64,8 +64,8 @@ class Data {
       };
 }
 
-class ItemsItem {
-  final int sectionid;
+class CommunityItem {
+  final int sectionId;
   final String sectionName;
   final int count;
   final String lat;
@@ -73,13 +73,13 @@ class ItemsItem {
   final PriceUnit priceUnit;
   final String gatherLat;
   final String gatherLng;
-  final int regionid;
+  final int regionId;
   final String regionName;
   final int shopCount;
   final String distance;
 
-  ItemsItem({
-    this.sectionid = 0,
+  CommunityItem({
+    this.sectionId = 0,
     this.sectionName = "",
     this.count = 0,
     this.lat = "",
@@ -87,14 +87,14 @@ class ItemsItem {
     required this.priceUnit,
     this.gatherLat = "",
     this.gatherLng = "",
-    this.regionid = 0,
+    this.regionId = 0,
     this.regionName = "",
     this.shopCount = 0,
     this.distance = "",
   });
 
-  factory ItemsItem.fromJson(Map<String, dynamic>? json) => ItemsItem(
-        sectionid: asInt(json, 'sectionid'),
+  factory CommunityItem.fromJson(Map<String, dynamic>? json) => CommunityItem(
+        sectionId: asInt(json, 'sectionid'),
         sectionName: asString(json, 'section_name'),
         count: asInt(json, 'count'),
         lat: asString(json, 'lat'),
@@ -102,14 +102,14 @@ class ItemsItem {
         priceUnit: PriceUnit.fromJson(asMap(json, 'price_unit')),
         gatherLat: asString(json, 'gather_lat'),
         gatherLng: asString(json, 'gather_lng'),
-        regionid: asInt(json, 'regionid'),
+        regionId: asInt(json, 'regionid'),
         regionName: asString(json, 'region_name'),
         shopCount: asInt(json, 'shop_count'),
         distance: asString(json, 'distance'),
       );
 
   Map<String, dynamic> toJson() => {
-        'sectionid': sectionid,
+        'sectionid': sectionId,
         'section_name': sectionName,
         'count': count,
         'lat': lat,
@@ -117,7 +117,7 @@ class ItemsItem {
         'price_unit': priceUnit.toJson(),
         'gather_lat': gatherLat,
         'gather_lng': gatherLng,
-        'regionid': regionid,
+        'regionid': regionId,
         'region_name': regionName,
         'shop_count': shopCount,
         'distance': distance,
