@@ -37,16 +37,6 @@ class MapPage extends StatelessWidget {
           body: Stack(
             children: [
               mapView,
-              Center(
-                child: CustomPaint(
-                  painter: BorderPainter(
-                    radius: 30,
-                    width: 120,
-                    height: 60,
-                    borderWidth: 5,
-                  ),
-                ),
-              ),
               if (state.displayBottomView)
                 Positioned(
                   bottom: 0,

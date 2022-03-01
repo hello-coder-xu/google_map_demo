@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -209,41 +210,87 @@ extension MarkerLogic on MapLogic {
 
   /// 大头针
   Future<BitmapDescriptor> getIcon(String title) async {
-    double width = 0.30.sw * 2;
-    double height = 0.085.sw * 2;
-    double sideSize = 0.02.sw * 2;
+    double width = 0.8.sw;
+    double height = 0.2.sw;
 
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint();
-    paint.strokeWidth = 5;
-    paint.color = Colors.white;
+    final double radius = height / 2;
 
-    // 椭圆型
-    final Radius radius = Radius.circular(height / 2);
-    final rect = Rect.fromLTWH(0.0, 0.0, width, height);
-    final rRect = RRect.fromRectAndCorners(
-      rect,
-      topLeft: radius,
-      topRight: radius,
-      bottomLeft: radius,
-      bottomRight: radius,
+    Rect rect = Rect.fromCenter(
+      center: Offset(width / 2, height / 2),
+      width: width,
+      height: height,
     );
+    RRect rRect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
+    Paint paintRect = Paint()
+      ..style = PaintingStyle.fill
+      ..strokeCap = StrokeCap.round;
+
     //渐变色
     const gradient = RadialGradient(
-      tileMode: TileMode.clamp,
+      tileMode: TileMode.mirror,
       colors: [Color(0xffff4400), Color(0xffff8000)],
     );
-    paint.shader = gradient.createShader(rect);
-    canvas.drawRRect(rRect, paint);
+    paintRect.shader = gradient.createShader(rect);
+    canvas.drawRRect(rRect, paintRect);
+    canvas.save();
+
+    // 边框
+    Paint initBorder = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 8;
+
+    Path path = Path()
+      // 上中点
+      ..moveTo(width / 2, 0)
+      ..relativeLineTo(width / 2 - radius, 0)
+      ..relativeArcToPoint(
+        Offset(radius, radius),
+        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+      )
+      //左弧线间-竖线
+      ..relativeLineTo(0, height - radius * 2)
+      // //左下弧线
+      ..relativeArcToPoint(
+        Offset(-radius, radius),
+        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+      )
+      ..relativeLineTo(-width + radius * 2, 0)
+      ..relativeArcToPoint(
+        Offset(-radius, -radius),
+        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+      )
+      ..relativeLineTo(0, -height + radius * 2)
+      ..relativeArcToPoint(
+        Offset(radius, -radius),
+        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+      )
+      ..relativeLineTo(width / 2 - radius, 0)
+      ..close();
+
+    canvas.drawPath(path, initBorder);
+    path.addRRect(rRect);
 
     // 三角形
-    var path = Path();
-    path.moveTo(width / 2, height + sideSize);
-    path.lineTo(width / 2 - sideSize, height - 3);
-    path.lineTo(width / 2 + sideSize, height - 3);
-    path.close();
-    canvas.drawPath(path, paint);
+    double sideSize = 36;
+    Paint paint3 = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 5;
+    Path path3 = Path();
+    path3.addPolygon(
+      [
+        Offset(width / 2 - sideSize / 2, height),
+        Offset(width / 2, height + sideSize),
+        Offset(width / 2 + sideSize / 2, height),
+      ],
+      false,
+    );
+    canvas.drawPath(path3, paint3);
 
     TextPainter painter = TextPainter(
       textDirection: TextDirection.ltr,
@@ -259,78 +306,17 @@ extension MarkerLogic on MapLogic {
 
     painter.layout();
     painter.paint(
-        canvas,
-        Offset((width * 0.5) - painter.width * 0.5,
-            (height * .5) - painter.height * 0.5));
-    final img = await pictureRecorder
-        .endRecording()
-        .toImage(width.toInt(), height.toInt() + sideSize.toInt());
+      canvas,
+      Offset(
+        (width * 0.5) - painter.width * 0.5,
+        (height * .5) - painter.height * 0.5,
+      ),
+    );
+    final img = await pictureRecorder.endRecording().toImage(
+          width.toInt(),
+          height.toInt() + sideSize.toInt(),
+        );
     ByteData? data = await img.toByteData(format: ImageByteFormat.png);
     return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
-  }
-}
-
-class BorderPainter extends CustomPainter {
-  BorderPainter({
-    required this.width,
-    required this.height,
-    this.radius = 50.0,
-    this.borderWidth = 3.0,
-  });
-
-  final double radius;
-  final double borderWidth;
-  final double width;
-  final double height;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Rect rect = Rect.fromCenter(
-        center: Offset(width / 2, height / 2), width: width, height: height);
-    RRect rRect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
-    Paint paintRect = Paint()..style = PaintingStyle.fill;
-
-    //渐变色
-    const gradient = RadialGradient(
-      tileMode: TileMode.mirror,
-      colors: [Color(0xffff4400), Color(0xffff8000)],
-    );
-    paintRect.shader = gradient.createShader(rect);
-    canvas.drawRRect(rRect, paintRect);
-    canvas.save();
-
-    // 边框
-    Paint initBorder = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = borderWidth;
-
-    Path path = Path()
-      // 移动到上中点
-      ..moveTo(width / 2, 0)
-      //
-      ..relativeLineTo(width / 2 - radius, 0)
-      ..relativeArcToPoint(Offset(radius, radius),
-          radius: Radius.circular(radius))
-      ..relativeLineTo(0, height - radius * 2)
-      ..relativeArcToPoint(Offset(-radius, radius),
-          radius: Radius.circular(radius))
-      ..relativeLineTo(-width + radius * 2, 0)
-      ..relativeArcToPoint(Offset(-radius, -radius),
-          radius: Radius.circular(radius))
-      ..relativeLineTo(0, -height + radius * 2)
-      ..relativeArcToPoint(Offset(radius, -radius),
-          radius: Radius.circular(radius))
-      ..relativeLineTo(width / 2 - radius, 0)
-      ..close();
-    canvas.drawPath(path, initBorder);
-    path.addRRect(rRect);
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
   }
 }
