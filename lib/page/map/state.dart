@@ -1,6 +1,6 @@
 import 'package:google_map_demo/common/bean/area_bean.dart';
-import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/bean/community_bean.dart';
+import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/bean/villages_bean.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -34,7 +34,7 @@ class MapState {
   int areaType = 1;
 
   ///县市
-  String regionId = '1';
+  String regionId = '0';
 
   ///地区
   String sectionId = '0';

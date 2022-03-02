@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/bean/community_bean.dart';
+import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/bean/villages_bean.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/page/map/logic_area.dart';
@@ -81,10 +81,46 @@ class MapLogic extends GetxController {
   }
 
   /// 地图点击
-  void mapOnTap(LatLng result) {
-    state.currentLatLng = result;
-    Logger.write(result.toString());
+  void mapOnTap(LatLng latLng) {
+    Logger.write('test 点击 latLng=$latLng');
+    state.currentLatLng = latLng;
     update();
+  }
+
+  ///地图移动开始-执行方法
+  void onCameraMoveStarted() {
+    Logger.write('test 开始移动');
+  }
+
+  ///地图移动结束-执行方法
+  void onCameraIdle() async {
+    double tempZoom = await state.controller?.getZoomLevel() ?? 1;
+
+    if (tempZoom <= state.city) {
+      //显示县市
+      state.zoomType = 1;
+    } else if (tempZoom <= state.village) {
+      //显示乡镇
+      state.zoomType = 2;
+    } else {
+      //显示商圈
+      state.zoomType = 3;
+    }
+
+    Logger.write('test 操作结束 tempZoom=$tempZoom zoomType=${state.zoomType}');
+
+    //加载社区
+    loadCommunityData();
+  }
+
+  /// 地图移动+缩放-执行的方法
+  void onCameraMove(CameraPosition position) {
+    Logger.write('test position=$position');
+  }
+
+  ///长按-执行方法
+  void onLongPress(LatLng? latLng) {
+    Logger.write('test 长按 latLng=$latLng');
   }
 
   /// 城市-大头针点击
@@ -126,9 +162,7 @@ class MapLogic extends GetxController {
   }
 
   /// 社区-大头针点击
-  void markerCommunityClick(CommunityItem bean, LatLng position) {
-
-  }
+  void markerCommunityClick(CommunityItem bean, LatLng position) {}
 
   /// 绘制圆
   void drawRound() {

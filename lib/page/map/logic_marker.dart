@@ -1,11 +1,10 @@
-import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_map_demo/common/api/api.dart';
-import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/bean/community_bean.dart';
+import 'package:google_map_demo/common/bean/city_bean.dart';
 import 'package:google_map_demo/common/bean/villages_bean.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/common/network/http_request.dart';
@@ -17,7 +16,6 @@ extension MarkerLogic on MapLogic {
   void loadCommunityData() async {
     LatLngBounds? latLngBounds = await state.controller?.getVisibleRegion();
 
-    Logger.write('test loadCommunityData：${latLngBounds?.toJson()}');
     if (latLngBounds == null) return;
     // 西南 -- 左下角
     LatLng leftDown = latLngBounds.southwest;
@@ -228,24 +226,25 @@ extension MarkerLogic on MapLogic {
       rect,
       Radius.circular(radius - strokeWidth),
     );
-    // Paint paintRect = Paint()
-    //   ..style = PaintingStyle.fill
-    //   ..strokeWidth = strokeWidth
-    //   ..strokeCap = StrokeCap.round;
-    //
-    // //渐变色
-    // const gradient = RadialGradient(
-    //   tileMode: TileMode.mirror,
-    //   colors: [Color(0xffff4400), Color(0xffff8000)],
-    // );
-    // paintRect.shader = gradient.createShader(rect);
-    // canvas.drawRRect(rRect, paintRect);
+    Paint paintRect = Paint()
+      ..style = PaintingStyle.fill
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    //渐变色
+    const gradient = RadialGradient(
+      tileMode: TileMode.mirror,
+      colors: [Color(0xffff4400), Color(0xffff8000)],
+    );
+    paintRect.shader = gradient.createShader(rect);
+    canvas.drawRRect(rRect, paintRect);
 
     // 边框
     Paint initBorder = Paint()
-      ..color = Colors.red
+      ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true
       ..strokeWidth = strokeWidth;
 
     Path path = Path()
@@ -255,29 +254,29 @@ extension MarkerLogic on MapLogic {
       ..relativeLineTo(width / 2 - radius, 0)
       // 右上-弧线
       ..relativeArcToPoint(
-        Offset(radius, radius),
-        radius: Radius.circular(radius - strokeWidth),
+        Offset(radius - 1, radius - 1),
+        radius: Radius.circular(radius),
       )
       //右-竖线
       ..relativeLineTo(0, height - radius * 2)
       //左下-弧线
       ..relativeArcToPoint(
         Offset(-radius, radius),
-        radius: Radius.circular(radius - strokeWidth),
+        radius: Radius.circular(radius),
       )
       //下线
       ..relativeLineTo(-width + radius * 2, 0)
       //左下-弧线
       ..relativeArcToPoint(
         Offset(-radius, -radius),
-        radius: Radius.circular(radius - strokeWidth),
+        radius: Radius.circular(radius),
       )
       // 左-竖线
       ..relativeLineTo(0, -height + radius * 2)
       // 左上-弧线
       ..relativeArcToPoint(
         Offset(radius, -radius),
-        radius: Radius.circular(radius - strokeWidth),
+        radius: Radius.circular(radius),
       )
       // 上-线
       ..relativeLineTo(width / 2 - radius, 0)
@@ -289,7 +288,7 @@ extension MarkerLogic on MapLogic {
     // 三角形
     double sideSize = 36;
     Paint paint3 = Paint()
-      ..color = Colors.red
+      ..color = Colors.white
       ..style = PaintingStyle.fill
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 5;
@@ -312,7 +311,7 @@ extension MarkerLogic on MapLogic {
       text: title,
       style: TextStyle(
         fontSize: 64.sp,
-        color: Colors.red,
+        color: Colors.white,
       ),
     );
 

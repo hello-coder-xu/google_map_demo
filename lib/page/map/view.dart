@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_map_demo/common/logger/logger_utils.dart';
 import 'package:google_map_demo/page/map/logic.dart';
+import 'package:google_map_demo/page/map/logic_marker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapPage extends StatelessWidget {
@@ -104,25 +105,17 @@ class MapPage extends StatelessWidget {
         //圆
         circles: Set<Circle>.of(state.circles.values),
         //地图移动开始-执行方法
-        onCameraMoveStarted: () {
-          Logger.write('test onCameraMoveStarted');
-        },
+        onCameraMoveStarted: logic.onCameraMoveStarted,
         //在地图上绘制一个层(可自定义)
         tileOverlays: Set<TileOverlay>.of(state.tileOverlays.values),
-        // 地图移动+缩放执行的方法
-        onCameraMove: (CameraPosition position) {
-          Logger.write('test position=$position');
-        },
+        // 地图移动+缩放-执行的方法
+        onCameraMove: logic.onCameraMove,
         //地图移动结束-执行方法
-        onCameraIdle: () {
-          Logger.write('test onCameraIdle');
-        },
+        onCameraIdle: logic.onCameraIdle,
         //点击-执行方法
         onTap: logic.mapOnTap,
         //长按-执行方法
-        onLongPress: (LatLng? latLng) {
-          Logger.write('test onLongPress latLng=$latLng');
-        },
+        onLongPress: logic.onLongPress,
       );
 
   /// 底部显示视图
