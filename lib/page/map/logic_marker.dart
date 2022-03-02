@@ -215,59 +215,71 @@ extension MarkerLogic on MapLogic {
 
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
+
     final double radius = height / 2;
+    double strokeWidth = 6;
 
     Rect rect = Rect.fromCenter(
       center: Offset(width / 2, height / 2),
       width: width,
       height: height,
     );
-    RRect rRect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
-    Paint paintRect = Paint()
-      ..style = PaintingStyle.fill
-      ..strokeCap = StrokeCap.round;
-
-    //渐变色
-    const gradient = RadialGradient(
-      tileMode: TileMode.mirror,
-      colors: [Color(0xffff4400), Color(0xffff8000)],
+    RRect rRect = RRect.fromRectAndRadius(
+      rect,
+      Radius.circular(radius - strokeWidth),
     );
-    paintRect.shader = gradient.createShader(rect);
-    canvas.drawRRect(rRect, paintRect);
-    canvas.save();
+    // Paint paintRect = Paint()
+    //   ..style = PaintingStyle.fill
+    //   ..strokeWidth = strokeWidth
+    //   ..strokeCap = StrokeCap.round;
+    //
+    // //渐变色
+    // const gradient = RadialGradient(
+    //   tileMode: TileMode.mirror,
+    //   colors: [Color(0xffff4400), Color(0xffff8000)],
+    // );
+    // paintRect.shader = gradient.createShader(rect);
+    // canvas.drawRRect(rRect, paintRect);
 
     // 边框
     Paint initBorder = Paint()
-      ..color = Colors.white
+      ..color = Colors.red
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
-      ..strokeWidth = 8;
+      ..strokeWidth = strokeWidth;
 
     Path path = Path()
-      // 上中点
+      // 上中-点
       ..moveTo(width / 2, 0)
+      // 右上-线
       ..relativeLineTo(width / 2 - radius, 0)
+      // 右上-弧线
       ..relativeArcToPoint(
         Offset(radius, radius),
-        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+        radius: Radius.circular(radius - strokeWidth),
       )
-      //左弧线间-竖线
+      //右-竖线
       ..relativeLineTo(0, height - radius * 2)
-      // //左下弧线
+      //左下-弧线
       ..relativeArcToPoint(
         Offset(-radius, radius),
-        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+        radius: Radius.circular(radius - strokeWidth),
       )
+      //下线
       ..relativeLineTo(-width + radius * 2, 0)
+      //左下-弧线
       ..relativeArcToPoint(
         Offset(-radius, -radius),
-        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+        radius: Radius.circular(radius - strokeWidth),
       )
+      // 左-竖线
       ..relativeLineTo(0, -height + radius * 2)
+      // 左上-弧线
       ..relativeArcToPoint(
         Offset(radius, -radius),
-        radius: Radius.circular(radius + initBorder.strokeWidth / 2),
+        radius: Radius.circular(radius - strokeWidth),
       )
+      // 上-线
       ..relativeLineTo(width / 2 - radius, 0)
       ..close();
 
@@ -277,7 +289,7 @@ extension MarkerLogic on MapLogic {
     // 三角形
     double sideSize = 36;
     Paint paint3 = Paint()
-      ..color = Colors.white
+      ..color = Colors.red
       ..style = PaintingStyle.fill
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 5;
@@ -300,7 +312,7 @@ extension MarkerLogic on MapLogic {
       text: title,
       style: TextStyle(
         fontSize: 64.sp,
-        color: Colors.white,
+        color: Colors.red,
       ),
     );
 
